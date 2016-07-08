@@ -1,0 +1,95 @@
+---
+title: "Coursera Capstone - Week 2"
+date: 2016-07-01
+author: suttonbm
+layout: post
+categories:
+  - projects
+tags:
+  - coursera
+  - data.science
+  - R
+project: datasciencecoursera.capstone
+excerpt: >
+  Exploratory Data Analysis
+---
+
+```{r echo=FALSE, message=FALSE}
+knitr::opts_chunk$set(message=FALSE, warning=FALSE)
+
+require(knitcitations)
+bib.file <- "capstone-citations.bibtex"
+bib <- read.bibtex(bib.file)
+```
+
+There are two tasks for week 2 of the SwiftKey Natural Language Processing Capstone for the Coursera Data Science specialization:
+
+  * Exploratory Data Analysis
+  * Simple Language Modeling
+
+In this post, I'll cover my exploratory data analysis, and will follow up on the simple model construction in the [next post]({{ base.url }}/2016/07/nlp_simple_model/)
+
+For more information on how I got to this point, refer to earlier posts about [NLP]({{ base.url }}/2016/06/nlp_intro/), [sampling data]({{ base.url }}/2016/06/sampling_data/), and [cleaning/tokenizing data]({{ base.url }}/2016/06/tokenize_clean_data/).
+
+The data for this project are located at: [Dataset](https://d396qusza40orc.cloudfront.net/dsscapstone/dataset/Coursera-SwiftKey.zip)
+
+### Introduction
+
+The goal of exploring the dataset (corpus) is to get a relative sense for what the data looks like and perhaps draw some qualitative conclusions about the data itself prior to generating a predictive model. There are six questions posed by the Coursera Course staff:
+
+  * Some words are more frequent than others - what are the distributions of word frequencies?
+  * What are the frequencies of 2-grams and 3-grams in the dataset?
+  * How many unique words do you need in a frequency sorted dictionary to cover 50% of all word instances in the language? 90%?
+  * How do you evaluate how many of the words come from foreign languages?
+  * Is there a way to improve coverage by identifying words that may not be in the corpora?
+  * Can you somehow use a smaller number of words to cover the same phrases?
+
+In addition to the questions above, I'll also look into whether a model built from the partial/sampled dataset I created [here]({{ base.url }}/2016/06/sampling_data/) can be used in model selection prior to building a full model from the entire corpus.
+
+### Getting Started
+
+Before I can get too deep into the analysis, I have to load in the data and perform some preprocessing.  The source code for the script I use to load the data can be found at [my Github](#).  Details on what's taking place inside the script can be found [here]({{ base.url }}/2016/06/tokenize_clean_data/).  Note - for the sake of exploratory analysis, the script does not remove stopwords.  I'll investigate the impact of removing stopwords further down.
+
+```{r message=FALSE, warning=FALSE}
+source('loadDataFromFile.R')
+```
+
+#### Sampled Data vs. Full Corpus
+
+Before I dig into the exploration or attempt to answer the questions posed by the Coursera Staff, I want to see if I can use the sampled data. There are a few metrics I'll look at:
+
+  * What does the distribution look like? Is it similar to the full corpus?
+  * what percentage of terms are captured in the sample data vs the corpus?
+  * Are missing terms high or low predictive value?
+
+I'll work with the twitter data to perfom these calculations.  First I'll load both corpora using the script I loaded above:
+
+```{r}
+twitter.sample <- loadDataFromFile('data/en-US.twitter.txt.0.01')
+twitter.full <- loadDataFromFile('data/en_US.twitter.txt')
+```
+
+First, let's take a look at the distributions of single terms. Rather than using the rather crude `strsplit()` approach used in my [tokenizing and cleaning post]({{ base.url }}/2016/06/tokenize_clean_data/), I'll use the `quanteda` package.  I did [an investigation into the fastest tokenizing option]({{ base.url }}/2016/07/tokenizing_aside) which found that the `quanteda` package scales most gracefully to large datasets.
+
+```{r message=FALSE, warning=FALSE}
+library(RWeka)
+
+delims <- "\\s.!?,;\"()"
+
+sample.tokens <- NGramTokenizer(twitter.sample, Weka_control(min=1, max=1))
+sample.tokens <- data.frame(table(sample.tokens))
+sample.tokens <- sample.tokens[order(sample.tokens$Freq, decreasing=TRUE), ]
+colnames(sample.tokens) <- c("Token", "Freq")
+
+full.tokens <- NGramTokenizer(twitter.full, Weka_control(min=1, max=1))
+full.tokens <- data.frame(table(full.tokens))
+full.tokens <- full.tokens[order(full.tokens$Freq, decreasing=TRUE), ]
+colnames(full.tokens) <- c("Token", "Freq")
+```
+
+We can look at the frequency terms in two different ways: a wordcloud (qualitative), or a histogram (quantitative).
+
+### References
+```{r echo=FALSE, results="asis"}
+bibliography("html")
+```

@@ -1,6 +1,5 @@
 ---
 title: "Natural Language Processing"
-author: "suttonbm"
 date: 2016-06-20
 author: suttonbm
 layout: post

@@ -1,0 +1,43 @@
+---
+title: "Coursera Capstone - Week 2"
+date: 2016-07-01
+author: suttonbm
+layout: post
+categories:
+  - projects
+tags:
+  - coursera
+  - data.science
+  - R
+project: datasciencecoursera.capstone
+excerpt: >
+  Creating a Simple Predictive Model
+---
+
+```{r echo=FALSE, message=FALSE}
+knitr::opts_chunk$set(message=FALSE, warning=FALSE)
+
+require(knitcitations)
+bib.file <- "capstone-citations.bibtex"
+bib <- read.bibtex(bib.file)
+```
+
+There are two tasks for week 2 of the SwiftKey Natural Language Processing Capstone for the Coursera Data Science specialization:
+
+  * Exploratory Data Analysis
+  * Simple Language Modeling
+
+In this post, I'll cover my exploratory data analysis, and will follow up on the simple model construction in the [next post]({{ base.url }}/2016/07/nlp_simple_model/)
+
+For more information on how I got to this point, refer to earlier posts about [NLP]({{ base.url }}/2016/06/nlp_intro/), [sampling data]({{ base.url }}/2016/06/sampling_data/), and [cleaning/tokenizing data]({{ base.url }}/2016/06/tokenize_clean_data/).
+
+The data for this project are located at: [Dataset](https://d396qusza40orc.cloudfront.net/dsscapstone/dataset/Coursera-SwiftKey.zip)
+
+### Introduction
+
+
+
+### References
+```{r echo=FALSE, results="asis"}
+bibliography("html")
+```
