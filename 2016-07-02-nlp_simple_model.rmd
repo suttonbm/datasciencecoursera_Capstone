@@ -1,6 +1,6 @@
 ---
 title: "Coursera Capstone - Week 2"
-date: 2016-07-01
+date: 2016-07-02
 author: suttonbm
 layout: post
 categories:

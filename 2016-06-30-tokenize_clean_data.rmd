@@ -15,7 +15,7 @@ excerpt: >
 ---
 
 ```{r echo=FALSE, message=FALSE}
-knitr::opts_chunk$set(message=FALSE, warning=FALSE)
+knitr::opts_chunk$set(message=FALSE, warning=FALSE, cache=FALSE)
 
 require(knitcitations)
 bib.file <- "capstone-citations.bibtex"
@@ -36,8 +36,15 @@ The data for this project are located at: [Dataset](https://d396qusza40orc.cloud
 I discussed generating a subsample of the text corpora used in the course in an [earlier post]({{ base.url }}/2016/06/sampling_data/). To start out, let's load the sampled dataset that was generated there:
 
 ```{r}
-data.sample.path <- "data/en-US.all.sampled.txt"
-data.sample <- readLines(data.sample.path)
+source("script/loadCorpusFromFile.R")
+
+sample.1 <- readLines("data/en_US.blogs.txt.0.005", encoding="UTF-8")
+sample.2 <- readLines("data/en_US.news.txt.0.005", encoding="UTF-8")
+sample.3 <- readLines("data/en_US.twitter.txt.0.005", encoding="UTF-8")
+
+data.sample <- c(sample.1, sample.2, sample.3)
+
+data.sample <- unlist(lapply(data.sample, removeSpecialCharacters))
 ```
 
 Next, we need to clean up the data. The strict definition above is to eliminate profanity if possible.  However, when doing natural language processing, we also need to consider predictive ability of words and eliminate those with low entropy (stopwords).
@@ -51,7 +58,7 @@ Both of these activities can be addressed using the `tm` package in R.  First, l
 library(tm)
 
 sample_corpus <- Corpus(VectorSource(data.sample))
-as.character(sample_corpus[[6]])
+iconv(as.character(sample_corpus[[6]]), to="ASCII")
 ```
 
 Using the corpus object within the `tm` package, we can perform some basic operations to clean up the data before splitting into tokens:
@@ -64,7 +71,7 @@ sample_corpus <- tm_map(sample_corpus, removeNumbers)
 # Convert to lowercase
 sample_corpus <- tm_map(sample_corpus, content_transformer(tolower))
 
-as.character(sample_corpus[[6]])
+iconv(as.character(sample_corpus[[6]]), to="ASCII")
 ```
 
 The `tm` package provides a convenient method of removing words from a corpus by using another data source.  For example:
@@ -92,7 +99,7 @@ sample_corpus <- tm_map(sample_corpus, removeWords, stopwords("english"))
 # Finally, strip excess whitespace
 sample_corpus <- tm_map(sample_corpus, stripWhitespace)
 
-as.character(sample_corpus[[6]])
+iconv(as.character(sample_corpus[[6]]), to="ASCII")
 ```
 
 In theory, now the corpus has had all expletives and english stopwords removed. Note how the printed line has changed between raw data import and pre-processing/cleaning.
@@ -102,10 +109,11 @@ In theory, now the corpus has had all expletives and english stopwords removed. 
 Now that I have a (reasonably) clean dataset, I need to split it into tokens.  In other words, I need to take a vector of *paragraphs* and turn it into a vector of *words*.  The most simplistic method is to split the strings by whitespace:
 
 ```{r}
-(sample_line <- strsplit(as.character(sample_corpus[[6]]), "\\s+"))
+(sample_line <- strsplit(iconv(as.character(sample_corpus[[6]]), to="ASCII"),
+                         "\\s+"))
 ```
 
-However, this may not be the best method of summarizing the data.  We'll explore this further in the [next post]({{ base_url }}/2016/07/nlp_data_exploration)
+However, this may not be the best method of summarizing the data.  We'll explore this further in the [next post]({{ base_url }}/2016/07/nlp_data_exploration/)
 
 ### References
 ```{r echo=FALSE, results="asis"}
